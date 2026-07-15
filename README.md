@@ -1,0 +1,86 @@
+# Rogues V Raiders
+
+Roaming Rogue and Raider warbands for SPT. They patrol, take points, travel between them, and fight you and
+each other. Squads sit on top of the normal bot population and never eat scav or PMC spawn slots.
+
+## Behaviour
+
+Squads are a leader plus two to four others — three to five bodies. Roughly 40% are placed at raid start and
+the rest arrive somewhere between the 10% and 60% mark, so the map keeps changing after the first ten
+minutes. They pick objectives, hold points of interest, move between them, and hunt.
+
+Rogues and Raiders are hostile to each other, and to the custom factions if you run them. Player treatment
+follows the Friendliness setting, which defaults to faction-authentic: Rogues keep their Lighthouse manners
+and warn USEC before shooting, BEAR gets no warning, Raiders shoot everyone.
+
+Where they roam:
+
+| Faction | Maps |
+|---|---|
+| Rogues | Customs, Woods, Shoreline, Lighthouse |
+| Raiders | Reserve, both Factories, Interchange, Labs |
+| Both | Streets, both Ground Zero tiers |
+
+Overlap maps roll for both factions independently, so that's where the two actually run into each other.
+
+## Kit
+
+Tuned to hurt, by default. Difficulty sits at impossible, weapons come in at 92–100% durability, armour at
+95–100%, ammo is weighted 60/25/10 across the top three penetrating rounds per calibre with nothing below
+that ever rolled, and gear is gated to armour class 4 and up.
+
+Note `forceHardestDifficulty` is on by default and rewrites the **vanilla** exUsec and pmcBot waves too — so
+the Rogues and Raiders already on the map get the same treatment, not only the squads this adds. Turn it off
+if you only want the warbands upgraded.
+
+## Spawn chance
+
+10% at level 15, +5% every 5 levels, capped at 25%. Solo uses your level; in Fika it averages the squad.
+
+The catch worth knowing up front: **Scale Chance By Level is on by default, and while it's on it overrides
+`rogueChance`, `raiderChance` and `overlapChance` completely.** Set a chance in the config, see nothing
+change, that's why. Turn the toggle off and the config numbers take over.
+
+## Install
+
+- `RoguesVRaidersServer` → `SPT/user/mods/`
+- `RoguesVRaiders` → `BepInEx/plugins/`
+
+On Fika, the server mod goes with the SPT server and the client plugin goes on whichever machine owns the
+raid, headless included. Everyone else needs nothing.
+
+## Requires
+
+**DrakiaXYZ-BigBrain** is the only hard dependency. **SAIN** is read by reflection rather than referenced —
+without it squads still spawn and roam, they just fight on the vanilla brain. **DrakiaXYZ-Waypoints** is
+optional but its expanded navmesh noticeably improves patrol coverage. **Fika** only matters for co-op.
+
+## Compatibility
+
+- **Acid's Bot Placement System** rebuilds `BossLocationSpawn` from scratch at boot and after every raid,
+  which wipes anything anyone else injected. Handled: the injector re-runs on raid start, after ABPS's pass
+  and before the raid snapshot is taken. Nothing for you to configure.
+- **ORBIT** must keep `Vanilla raiders (RESTART)` set to `true`. With it true ORBIT leaves exUsec and pmcBot
+  alone. Flip it false and ORBIT starts driving the same bots this does, and the two will fight over the
+  mover.
+
+## Config
+
+`user/mods/RoguesVRaidersServer/config.jsonc`, server restart to apply: faction map lists, per-map chance
+overrides (Reserve and Labs are dialled back to 15), `escortAmount`, spawn timing (`startSpawnShare`,
+`midRaidEarliest`, `midRaidLatest`), and the upgrade block (`difficulty`, `forceHardestDifficulty`,
+`upgradeDurability`, `upgradeAmmo`, `ammoRankWeights`, `upgradeGearTier`, `minArmorClass`).
+
+F12, section *Rogues V Raiders*: Enable, Rogue Squads, Raider Squads, Friendliness, Roaming Objectives,
+Objective Layer Priority, Lockdown POIs, Lockdown Delay, Broad AI Hostility, Hunt and Takeover, Min Spawn
+Distance, Alive Bot Ceiling, Force Spawn Over Bot Cap, Scale Chance By Level, Verbose Logs.
+
+Squad sizes assume the As Online bot amount setting.
+
+## Build
+
+`dotnet build -c Release` with the .NET SDK 8+. `Core` holds the logic that isn't tied to the game assemblies
+and is unit-tested — `dotnet test` runs `Client.Tests` and `Server.Tests`. `SptRoot` in the csproj resolves
+the SPT install.
+
+Built against SPT 4.0.13 / EFT 0.16.9.

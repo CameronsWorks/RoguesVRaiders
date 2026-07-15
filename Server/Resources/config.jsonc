@@ -1,0 +1,39 @@
+{
+  // Dev switches
+  "debugLogs": false,
+  "debugAlwaysSpawn": false,   // true = every squad 100% chance, fires ~60s in
+
+  // Where each faction roams. Overlap maps roll BOTH factions.
+  "rogueMaps": ["bigmap", "woods", "shoreline", "lighthouse"],
+  "raiderMaps": ["rezervbase", "factory4_day", "factory4_night", "interchange", "laboratory"],
+  "overlapMaps": ["tarkovstreets", "sandbox", "sandbox_high"],
+
+  // Per-raid spawn chance (%). Overrides win over the faction defaults.
+  "rogueChance": 25,
+  "raiderChance": 25,
+  "overlapChance": 35,
+  "chanceOverrides": { "rezervbase": 15, "laboratory": 15 },
+
+  // Squad size = 1 leader + one entry rolled from this list (3-5 total).
+  "escortAmount": "2,2,3,3,4",
+
+  // Spawn timing: share of squads at raid start, rest between 10%-60% of the raid.
+  "startSpawnShare": 0.4,
+  "midRaidEarliest": 0.10,
+  "midRaidLatest": 0.60,
+
+  // Faction-global upgrades (apply to ALL rogues/raiders, vanilla spawns included)
+  "difficulty": "impossible",          // easy | normal | hard | impossible
+  "forceHardestDifficulty": true,      // rewrite vanilla exUsec/pmcBot waves too
+  "upgradeDurability": true,
+  "weaponLowestMax": 98,               // with maxDelta 6 => current durability 92-100
+  "weaponMaxDelta": 6,
+  "armorLowestMaxPercent": 95,
+  "armorMaxDelta": 5,
+  "upgradeAmmo": true,
+  "ammoRankWeights": [60, 25, 10],     // weight for best/2nd/3rd pen round per caliber
+  "ammoTailWeight": 0,                 // weight for everything below the top ranks (0 = never picked)
+
+  "upgradeGearTier": true,             // gate headwear/vests to armored, high-class gear
+  "minArmorClass": 4                   // minimum resolved armor class kept in filtered pools
+}
