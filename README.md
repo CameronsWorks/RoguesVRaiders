@@ -5,9 +5,10 @@ each other. Squads sit on top of the normal bot population and never eat scav or
 
 ## Behaviour
 
-Squads are a leader plus two to four others — three to five bodies. Roughly 40% are placed at raid start and
-the rest arrive somewhere between the 10% and 60% mark, so the map keeps changing after the first ten
-minutes. They pick objectives, hold points of interest, move between them, and hunt.
+Squads are a leader plus two to four others — three to five bodies. Each one rolls separately for whether it
+starts on the map or arrives later, at about a 40/60 split; the latecomers turn up somewhere between the 10%
+and 60% mark of the raid clock, scaled to whatever that map's timer is. So the place keeps changing after the
+first ten minutes. They pick objectives, hold points of interest, move between them, and hunt.
 
 Rogues and Raiders are hostile to each other, and to the custom factions if you run them. Player treatment
 follows the Friendliness setting, which defaults to faction-authentic: Rogues keep their Lighthouse manners
@@ -26,12 +27,15 @@ Overlap maps roll for both factions independently, so that's where the two actua
 ## Kit
 
 Tuned to hurt, by default. Difficulty sits at impossible, weapons come in at 92–100% durability, armour at
-95–100%, ammo is weighted 60/25/10 across the top three penetrating rounds per calibre with nothing below
+90–100%, ammo is weighted 60/25/10 across the top three penetrating rounds per calibre with nothing below
 that ever rolled, and gear is gated to armour class 4 and up.
 
-Note `forceHardestDifficulty` is on by default and rewrites the **vanilla** exUsec and pmcBot waves too — so
-the Rogues and Raiders already on the map get the same treatment, not only the squads this adds. Turn it off
-if you only want the warbands upgraded.
+These upgrades are faction-wide, which is worth understanding before you tune them. They rewrite the shared
+exUsec and pmcBot data, so the ordinary Rogues and Raiders already on the map get them too, not only the
+squads this adds. Each one has its own switch — `upgradeDurability`, `upgradeAmmo`, `upgradeGearTier` — so
+turn off whichever you don't want. `forceHardestDifficulty` is a separate thing and does less than the name
+suggests: it only pushes the vanilla exUsec and pmcBot waves onto the same difficulty tier. Switching it off
+leaves the gear and ammo upgrades reaching vanilla spawns regardless.
 
 ## Spawn chance
 
