@@ -53,8 +53,15 @@ change, that's why. Turn the toggle off and the config numbers take over.
 
 ## Install
 
+Extract into your SPT folder — the one holding `EscapeFromTarkov.exe` and `BepInEx`. Merge `SPT` and
+`BepInEx` when Windows asks, then restart the server. That puts:
+
 - `RoguesVRaidersServer` → `SPT/user/mods/`
 - `RoguesVRaiders` → `BepInEx/plugins/`
+
+Upgrading from 0.1.1 or earlier: those builds put the server mod in `user\mods\RoguesVRaidersServer` at the
+install root by mistake, where the server never read it. Delete that stray `user` folder — the real one is
+`SPT\user\mods\RoguesVRaidersServer`.
 
 On Fika, the server mod goes with the SPT server and the client plugin goes on whichever machine owns the
 raid, headless included. Everyone else needs nothing.
@@ -76,7 +83,7 @@ optional but its expanded navmesh noticeably improves patrol coverage. **Fika** 
 
 ## Config
 
-`user/mods/RoguesVRaidersServer/config.jsonc`, server restart to apply: faction map lists, per-map chance
+`SPT/user/mods/RoguesVRaidersServer/config.jsonc`, server restart to apply: faction map lists, per-map chance
 overrides (Reserve and Labs are dialled back to 15), `escortAmount`, spawn timing (`startSpawnShare`,
 `midRaidEarliest`, `midRaidLatest`), and the upgrade block (`difficulty`, `forceHardestDifficulty`,
 `upgradeDurability`, `upgradeAmmo`, `ammoRankWeights`, `upgradeGearTier`, `minArmorClass`).
@@ -89,8 +96,9 @@ Squad sizes assume the As Online bot amount setting.
 
 ## Build
 
-`dotnet build -c Release` with the .NET SDK 8+. `Core` holds the logic that isn't tied to the game assemblies
-and is unit-tested — `dotnet test` runs `Client.Tests` and `Server.Tests`. `SptRoot` in the csproj resolves
-the SPT install.
+`dotnet build -c Release` with the .NET SDK 9+. `Client` and `Core` are net472, `Server` is net9.0. `Core`
+holds the logic that isn't tied to the game assemblies and is unit-tested — `dotnet test` runs `Client.Tests`
+and `Server.Tests`. Two anchors resolve the install: `SptRoot` (the game folder) in Client, `SptServer` (the
+`SPT` folder inside it) in Server.
 
 Built against SPT 4.0.13 / EFT 0.16.9.
