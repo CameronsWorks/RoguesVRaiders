@@ -29,7 +29,6 @@ public class ModConfig
     public bool upgradeDurability { get; set; } = true;
     public int weaponLowestMax { get; set; } = 98;
     public int weaponMaxDelta { get; set; } = 6;
-    public int armorLowestMaxPercent { get; set; } = 95;
     public int armorMaxDelta { get; set; } = 5;
 
     public bool upgradeAmmo { get; set; } = true;

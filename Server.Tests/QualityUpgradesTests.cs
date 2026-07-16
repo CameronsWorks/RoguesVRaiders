@@ -14,20 +14,31 @@ public class QualityUpgradesTests
     };
 
     [Fact]
-    public void DurabilityUpgradeSetsNinetyToHundredBand()
+    public void DurabilityUpgradeTightensWeaponBandAndArmorDelta()
     {
         var d = Stock();
-        QualityUpgrades.ApplyDurability(d, weaponLowestMax: 95, weaponMaxDelta: 5, armorLowestMaxPercent: 95, armorMaxDelta: 5);
+        QualityUpgrades.ApplyDurability(d, weaponLowestMax: 95, weaponMaxDelta: 5, armorMaxDelta: 5);
 
         Assert.Equal(95, d.Weapon.LowestMax);
         Assert.Equal(100, d.Weapon.HighestMax);
         Assert.Equal(5, d.Weapon.MaxDelta);
         Assert.Equal(0, d.Weapon.MinDelta);
 
-        Assert.Equal(95, d.Armor.LowestMaxPercent);
-        Assert.Equal(100, d.Armor.HighestMaxPercent);
         Assert.Equal(5, d.Armor.MaxDelta);
         Assert.Equal(0, d.Armor.MinDelta);
+    }
+
+    // Guard, not an oversight: the server reads lowest/highestMaxPercent only off durability.pmc.armor,
+    // so writing them on a botDurabilities entry looks effective and does nothing. Setting them here
+    // used to pass a test while changing no in-raid behaviour.
+    [Fact]
+    public void DurabilityUpgradeLeavesUnreadArmorPercentFieldsAlone()
+    {
+        var d = Stock();
+        QualityUpgrades.ApplyDurability(d, weaponLowestMax: 95, weaponMaxDelta: 5, armorMaxDelta: 5);
+
+        Assert.Null(d.Armor.LowestMaxPercent);
+        Assert.Null(d.Armor.HighestMaxPercent);
     }
 
     [Fact]

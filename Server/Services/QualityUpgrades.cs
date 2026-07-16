@@ -10,16 +10,17 @@ public static class QualityUpgrades
 {
     public static readonly string[] TargetBossNames = ["exUsec", "pmcBot"];
 
+    // No armor Lowest/HighestMaxPercent here on purpose: DurabilityLimitsHelper only reads those
+    // off durability.pmc.armor, and exUsec/pmcBot aren't in BotHelper's PMC set, so their armor max
+    // is always the item's full MaxDurability. MaxDelta/MinDelta are the only armor knobs read.
     public static void ApplyDurability(DefaultDurability d,
-        int weaponLowestMax, int weaponMaxDelta, int armorLowestMaxPercent, int armorMaxDelta)
+        int weaponLowestMax, int weaponMaxDelta, int armorMaxDelta)
     {
         d.Weapon.LowestMax = weaponLowestMax;
         d.Weapon.HighestMax = 100;
         d.Weapon.MaxDelta = weaponMaxDelta;
         d.Weapon.MinDelta = 0;
 
-        d.Armor.LowestMaxPercent = armorLowestMaxPercent;
-        d.Armor.HighestMaxPercent = 100;
         d.Armor.MaxDelta = armorMaxDelta;
         d.Armor.MinDelta = 0;
     }
@@ -65,8 +66,7 @@ public class QualityUpgradeService(
             {
                 if (durabilities.TryGetValue(key, out var d))
                 {
-                    QualityUpgrades.ApplyDurability(d, cfg.weaponLowestMax, cfg.weaponMaxDelta,
-                        cfg.armorLowestMaxPercent, cfg.armorMaxDelta);
+                    QualityUpgrades.ApplyDurability(d, cfg.weaponLowestMax, cfg.weaponMaxDelta, cfg.armorMaxDelta);
                     hits++;
                 }
             }

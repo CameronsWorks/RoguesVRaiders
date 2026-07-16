@@ -34,7 +34,7 @@ Armour is stated in points rather than a percentage on purpose. SPT only applies
 on bots it considers PMCs, and `exUsec`/`pmcBot` aren't in that set — so their armour starts at the item's
 full durability and comes off by a flat roll of 0–5 points (`armorMaxDelta`). What that works out to as a
 percentage depends on the piece: 5 points off a 15-durability helmet is a lot, off an 85-durability shield
-it's nothing. `armorLowestMaxPercent` in the config has no effect for these roles.
+it's nothing. `armorMaxDelta` is the only armour durability knob the server actually reads for these roles.
 
 These upgrades are faction-wide, which is worth understanding before you tune them. They rewrite the shared
 exUsec and pmcBot data, so the ordinary Rogues and Raiders already on the map get them too, not only the

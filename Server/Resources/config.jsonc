@@ -28,8 +28,9 @@
   "upgradeDurability": true,
   "weaponLowestMax": 98,               // with maxDelta 6 => current durability 92-100
   "weaponMaxDelta": 6,
-  "armorLowestMaxPercent": 95,
-  "armorMaxDelta": 5,
+  "armorMaxDelta": 5,                  // armor is full max minus 0-5 durability POINTS, not percent, so the %
+                                       // varies by item (0-5 off a 50-pt plate = 90-100%, off a 25-pt piece = 80-100%).
+                                       // No armor max-percent knob: the server honours that only for real PMCs.
   "upgradeAmmo": true,
   "ammoRankWeights": [60, 25, 10],     // weight for best/2nd/3rd pen round per caliber
   "ammoTailWeight": 0,                 // weight for everything below the top ranks (0 = never picked)
