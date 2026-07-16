@@ -26,9 +26,15 @@ Overlap maps roll for both factions independently, so that's where the two actua
 
 ## Kit
 
-Tuned to hurt, by default. Difficulty sits at impossible, weapons come in at 92–100% durability, armour at
-90–100%, ammo is weighted 60/25/10 across the top three penetrating rounds per calibre with nothing below
-that ever rolled, and gear is gated to armour class 4 and up.
+Tuned to hurt, by default. Difficulty sits at impossible, weapons come in at 92–100% durability, armour
+spawns within 5 durability points of full, ammo is weighted 60/25/10 across the top three penetrating
+rounds per calibre with nothing below that ever rolled, and gear is gated to armour class 4 and up.
+
+Armour is stated in points rather than a percentage on purpose. SPT only applies a percentage band to armour
+on bots it considers PMCs, and `exUsec`/`pmcBot` aren't in that set — so their armour starts at the item's
+full durability and comes off by a flat roll of 0–5 points (`armorMaxDelta`). What that works out to as a
+percentage depends on the piece: 5 points off a 15-durability helmet is a lot, off an 85-durability shield
+it's nothing. `armorLowestMaxPercent` in the config has no effect for these roles.
 
 These upgrades are faction-wide, which is worth understanding before you tune them. They rewrite the shared
 exUsec and pmcBot data, so the ordinary Rogues and Raiders already on the map get them too, not only the
