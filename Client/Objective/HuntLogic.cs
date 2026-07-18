@@ -18,7 +18,7 @@ namespace RoguesVRaiders.Objective
         public override void Start()
         {
             var bb = RvRObjectiveController.GetBlackboard(BotOwner.BotsGroup);
-            if (bb != null) bb.LastLeaderOrderPos = new Vector3(float.MaxValue, float.MaxValue, float.MaxValue);
+            if (bb != null) bb.LastOrderTarget.Remove(BotOwner);
             _startedAt = Time.time;
         }
 
@@ -30,7 +30,7 @@ namespace RoguesVRaiders.Objective
 
             var isLeader = ReferenceEquals(BotOwner, bb.Leader);
             var target = isLeader ? bb.HuntTargetPos : Follower.SlotTarget(BotOwner, bb);
-            Movement.DriveTo(BotOwner, bb, target, isLeader, ReachDist, SprintBeyond, ReissueDist, slowAtTheEnd: true);
+            Movement.DriveTo(BotOwner, bb, target, ReachDist, SprintBeyond, ReissueDist, slowAtTheEnd: true);
         }
     }
 }

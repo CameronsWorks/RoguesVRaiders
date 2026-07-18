@@ -4,6 +4,8 @@ public static class SpawnPlanner
 {
     public const string Marker = "sipto.rvr.";
 
+    static readonly int[] DefaultEscorts = [2, 2, 3, 3, 4];
+
     public record MapInput(string MapId, double EscapeMinutes, string OpenZones);
 
     public record SquadPlan(string TriggerId, string Faction, string BossType,
@@ -53,10 +55,8 @@ public static class SpawnPlanner
         }
 
         // Total squad = boss + escorts; escortAmount holds escort-only counts (2-4), so +1 boss = 3-5.
-        var escortCounts = cfg.escortAmount
-            .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
-            .Select(int.Parse)
-            .ToArray();
+        // ConfigService vets the string on load; the fallback covers PlanMap being called directly.
+        var escortCounts = ConfigService.ParseEscorts(cfg.escortAmount) ?? DefaultEscorts;
         var size = 1 + escortCounts[rng.Next(escortCounts.Length)];
 
         // Stable id, never randomized: the raid consumes a snapshot of the location that can be

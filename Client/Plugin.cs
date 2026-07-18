@@ -6,7 +6,7 @@ namespace RoguesVRaiders
 {
     public enum Friendliness { FactionAuthentic, FriendlyToPlayers, HostileToAll }
 
-    [BepInPlugin(PluginId, "Rogues V Raiders", "0.1.2")]
+    [BepInPlugin(PluginId, "Rogues V Raiders", "0.1.3")]
     [BepInDependency("com.fika.core", BepInDependency.DependencyFlags.SoftDependency)]
     [BepInDependency("xyz.drakia.bigbrain")]
     [BepInDependency("xyz.drakia.waypoints", BepInDependency.DependencyFlags.SoftDependency)]

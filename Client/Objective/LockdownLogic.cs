@@ -9,6 +9,7 @@ namespace RoguesVRaiders.Objective
     {
         const float ResumeSettle = 2f;
         const float ReachDist = 1.5f;
+        const float ReissueDist = 1f;
 
         float _startedAt;
 
@@ -16,6 +17,10 @@ namespace RoguesVRaiders.Objective
 
         public override void Start()
         {
+            // Drop any throttle carried in from the previous logic. A post never moves, so a bot arriving
+            // with an entry already on it would wait for a destination change that can never come.
+            var bb = RvRObjectiveController.GetBlackboard(BotOwner.BotsGroup);
+            if (bb != null) bb.LastOrderTarget.Remove(BotOwner);
             _startedAt = Time.time;
         }
 
@@ -37,8 +42,15 @@ namespace RoguesVRaiders.Objective
 
             if (!NavMesh.SamplePosition(post, out var hit, 3f, NavMesh.AllAreas)) return;
             BotOwner.SetTargetMoveSpeed(1f);
-            if (BotOwner.Mover.GoToPoint(hit.position, true, ReachDist) != NavMeshPathStatus.PathInvalid)
-                BotOwner.Steering.LookToPoint(hit.position);
+
+            if (Movement.ShouldReissue(bb, BotOwner, hit.position, ReissueDist) &&
+                BotOwner.Mover.GoToPoint(hit.position, true, ReachDist, mustHaveWay: false) == NavMeshPathStatus.PathInvalid)
+            {
+                bb.LastOrderTarget.Remove(BotOwner);   // retry next tick
+                return;
+            }
+
+            BotOwner.Steering.LookToPoint(hit.position);
         }
     }
 }

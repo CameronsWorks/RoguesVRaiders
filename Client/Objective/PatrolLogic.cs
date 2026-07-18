@@ -19,7 +19,7 @@ namespace RoguesVRaiders.Objective
         public override void Start()
         {
             var bb = RvRObjectiveController.GetBlackboard(BotOwner.BotsGroup);
-            if (bb != null) bb.LastLeaderOrderPos = new Vector3(float.MaxValue, float.MaxValue, float.MaxValue);
+            if (bb != null) bb.LastOrderTarget.Remove(BotOwner);
             _startedAt = Time.time;
         }
 
@@ -32,7 +32,7 @@ namespace RoguesVRaiders.Objective
             var isLeader = ReferenceEquals(BotOwner, bb.Leader);
             if (!isLeader)
             {
-                Movement.DriveTo(BotOwner, bb, Follower.SlotTarget(BotOwner, bb), false, ReachDist, 40f, ReissueDist, slowAtTheEnd: false);
+                Movement.DriveTo(BotOwner, bb, Follower.SlotTarget(BotOwner, bb), ReachDist, 40f, ReissueDist, slowAtTheEnd: false);
                 return;
             }
 
@@ -49,12 +49,12 @@ namespace RoguesVRaiders.Objective
             {
                 bb.DwellUntil = Time.time + DwellSeconds;
                 bb.RingIndex = (bb.RingIndex + 1) % bb.Ring.Count;
-                bb.LastLeaderOrderPos = new Vector3(float.MaxValue, float.MaxValue, float.MaxValue);
+                bb.LastOrderTarget.Remove(BotOwner);
                 BotOwner.Steering.LookToMovingDirection();
                 return;
             }
 
-            Movement.DriveTo(BotOwner, bb, target, true, ReachDist, 40f, ReissueDist, slowAtTheEnd: true);
+            Movement.DriveTo(BotOwner, bb, target, ReachDist, 40f, ReissueDist, slowAtTheEnd: true);
         }
     }
 }

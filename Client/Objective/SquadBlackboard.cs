@@ -30,8 +30,11 @@ namespace RoguesVRaiders.Objective
         public Vector3 HuntTargetPos;
         public bool FoughtTarget;
 
-        // Movement throttling: re-issue orders only when the leader has moved this far since the last order.
-        public Vector3 LastLeaderOrderPos = new Vector3(float.MaxValue, float.MaxValue, float.MaxValue);
+        // Movement throttling, per bot: where each bot was last sent. An order is only re-issued once the
+        // destination has moved - a follower's slot tracks the leader, so throttling on the bot's own
+        // position instead would stall a follower that stopped. No entry means never ordered, or the last
+        // path failed, so the next call always issues.
+        public readonly Dictionary<BotOwner, Vector3> LastOrderTarget = new Dictionary<BotOwner, Vector3>();
 
         public SquadBlackboard(BotsGroup group) { Group = group; }
     }

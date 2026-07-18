@@ -12,7 +12,7 @@ public record ModMetadata : AbstractModMetadata
     public override string Name { get; init; } = "RoguesVRaiders";
     public override string Author { get; init; } = "Sipto";
     public override List<string>? Contributors { get; init; }
-    public override SemanticVersioning.Version Version { get; init; } = new(0, 1, 2);
+    public override SemanticVersioning.Version Version { get; init; } = new(0, 1, 3);
     public override SemanticVersioning.Range SptVersion { get; init; } = new("~4.0.0");
     public override List<string>? Incompatibilities { get; init; }
     public override Dictionary<string, SemanticVersioning.Range>? ModDependencies { get; init; }
@@ -32,9 +32,20 @@ public class RvRLoader(
 {
     public Task OnLoad()
     {
-        qualityUpgrades.Apply();
-        spawnInjector.Refresh();
-        logger.Info("[RvR] server mod ready");
+        // Nothing upstream catches a throw out of IOnLoad - it reaches Program.StartServer, which logs a
+        // critical exception and stops the server. A bad value in our own config would cost the player the
+        // whole game rather than just this mod, so it fails inert instead.
+        try
+        {
+            qualityUpgrades.Apply();
+            spawnInjector.Refresh();
+            logger.Info("[RvR] server mod ready");
+        }
+        catch (Exception ex)
+        {
+            logger.Error("[RvR] startup failed, no squads will spawn this session. Gear upgrades may be " +
+                         $"partly applied - restart the server once this is fixed. {ex}");
+        }
         return Task.CompletedTask;
     }
 }

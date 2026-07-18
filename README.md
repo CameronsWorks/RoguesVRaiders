@@ -69,8 +69,10 @@ raid, headless included. Everyone else needs nothing.
 ## Requires
 
 **DrakiaXYZ-BigBrain** is the only hard dependency. **SAIN** is read by reflection rather than referenced —
-without it squads still spawn and roam, they just fight on the vanilla brain. **DrakiaXYZ-Waypoints** is
-optional but its expanded navmesh noticeably improves patrol coverage. **Fika** only matters for co-op.
+without it squads still spawn and roam, they just fight on the vanilla brain. If SAIN is installed but a
+version change makes it unreadable, the squads hand movement back to it rather than fight it for the mover,
+and say so once in the log. **DrakiaXYZ-Waypoints** is optional but its expanded navmesh noticeably improves
+patrol coverage. **Fika** only matters for co-op.
 
 ## Compatibility
 
@@ -80,6 +82,11 @@ optional but its expanded navmesh noticeably improves patrol coverage. **Fika** 
 - **ORBIT** must keep `Vanilla raiders (RESTART)` set to `true`. With it true ORBIT leaves exUsec and pmcBot
   alone. Flip it false and ORBIT starts driving the same bots this does, and the two will fight over the
   mover.
+- **Other gear or difficulty mods that touch exUsec or pmcBot** lose to this one. The upgrade block rewrites
+  durability, ammo pools, equipment pools and armour plate weighting in place, and this mod deliberately
+  loads late so it lands after ABPS — which means it also lands after most others. Nothing is written to
+  disk, so it's all undone by a server restart, but for the session the last writer wins. Turn off the
+  individual `upgrade*` switches for whichever part you'd rather the other mod owned.
 
 ## Config
 
@@ -87,6 +94,10 @@ optional but its expanded navmesh noticeably improves patrol coverage. **Fika** 
 overrides (Reserve and Labs are dialled back to 15), `escortAmount`, spawn timing (`startSpawnShare`,
 `midRaidEarliest`, `midRaidLatest`), and the upgrade block (`difficulty`, `forceHardestDifficulty`,
 `upgradeDurability`, `upgradeAmmo`, `ammoRankWeights`, `upgradeGearTier`, `minArmorClass`).
+
+Values are checked as they load. Anything unusable — an empty `escortAmount`, a chance of 5000, a `null`
+where a list belongs — clamps into range or reverts to its default and says which in the server log. A
+config the mod can't use at all leaves the mod inert for that session instead of stopping the server.
 
 F12, section *Rogues V Raiders*: Enable, Rogue Squads, Raider Squads, Friendliness, Roaming Objectives,
 Objective Layer Priority, Lockdown POIs, Lockdown Delay, Broad AI Hostility, Hunt and Takeover, Min Spawn

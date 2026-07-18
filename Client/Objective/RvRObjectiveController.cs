@@ -32,6 +32,7 @@ namespace RoguesVRaiders.Objective
             _blackboards.Clear();
             _takenRings.Clear();
             SuppressionPatches.Active = false;
+            SuppressionPatches.ReportUnmatched();
         }
 
         // Called from TriggerScheduler.Update (~5s), host-only.
@@ -314,25 +315,35 @@ namespace RoguesVRaiders.Objective
 
     internal static class Movement
     {
-        public static void DriveTo(BotOwner bot, SquadBlackboard bb, Vector3 target, bool isLeader,
+        // Every bot is throttled, not just the leader: a follower's slot moves with the leader, so an
+        // unthrottled follower re-pathed on every frame. Steering and sprint stay per-frame - only the
+        // path request is throttled.
+        public static void DriveTo(BotOwner bot, SquadBlackboard bb, Vector3 target,
             float reachDist, float sprintBeyond, float reissueDist, bool slowAtTheEnd)
         {
             if (!NavMesh.SamplePosition(target, out var hit, 5f, NavMesh.AllAreas)) return;
 
-            if (isLeader)
+            if (ShouldReissue(bb, bot, hit.position, reissueDist) &&
+                bot.Mover.GoToPoint(hit.position, slowAtTheEnd, reachDist, mustHaveWay: false) == NavMeshPathStatus.PathInvalid)
             {
-                if ((bb.LastLeaderOrderPos - bot.Position).sqrMagnitude < reissueDist * reissueDist) return;
-                bb.LastLeaderOrderPos = bot.Position;
-            }
-
-            var status = bot.Mover.GoToPoint(hit.position, slowAtTheEnd, reachDist);
-            if (status == NavMeshPathStatus.PathInvalid)
-            {
-                if (isLeader) bb.LastLeaderOrderPos = new Vector3(float.MaxValue, float.MaxValue, float.MaxValue); // retry next tick
+                bb.LastOrderTarget.Remove(bot);   // retry next tick
                 return;
             }
+
             bot.Sprint(bot.Mover.DistDestination > sprintBeyond);
             bot.Steering.LookToMovingDirection();
+        }
+
+        // mustHaveWay is left off wherever we path: with it on, EFT answers a failed path by teleporting the
+        // bot to its nearest cover node, and a formation slot lands off the cover graph often enough that it
+        // shows. The returned PathInvalid is no defence - the snap happens inside the call.
+        public static bool ShouldReissue(SquadBlackboard bb, BotOwner bot, Vector3 target, float reissueDist)
+        {
+            if (bb.LastOrderTarget.TryGetValue(bot, out var last) &&
+                (last - target).sqrMagnitude < reissueDist * reissueDist) return false;
+
+            bb.LastOrderTarget[bot] = target;
+            return true;
         }
     }
 
