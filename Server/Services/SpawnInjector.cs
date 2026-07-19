@@ -96,22 +96,29 @@ public class SpawnInjector(
 
     void ApplyToMap(LocationBase mapBase, List<SpawnPlanner.SquadPlan>? plans, ModConfig cfg)
     {
-        mapBase.BossLocationSpawn!.RemoveAll(w => w.TriggerId?.StartsWith(Marker) == true);
-
-        if (plans != null)
+        // Lock the map object, not just our own _sync: Wedge locks the same token, so when
+        // raid-start/raid-end handlers from both mods overlap on a co-op host the rewrites of
+        // one map's wave list serialize instead of tearing it. Never lock the list itself -
+        // ABPS swaps in a fresh instance at raid end, changing the token identity mid-flight.
+        lock (mapBase)
         {
-            foreach (var plan in plans)
+            mapBase.BossLocationSpawn!.RemoveAll(w => w.TriggerId?.StartsWith(Marker) == true);
+
+            if (plans != null)
             {
-                mapBase.BossLocationSpawn.Add(ToWave(plan, cfg));
+                foreach (var plan in plans)
+                {
+                    mapBase.BossLocationSpawn.Add(ToWave(plan, cfg));
+                }
             }
-        }
 
-        // ABPS (and anything else) rebuilds BossLocationSpawn wholesale at boot and on raid
-        // end, wiping the difficulty rewrite of vanilla exUsec/pmcBot waves. Reapplying here
-        // covers our own entries redundantly and the vanilla/ABPS-recreated ones meaningfully.
-        if (cfg.forceHardestDifficulty)
-        {
-            QualityUpgrades.ForceDifficulty(mapBase.BossLocationSpawn, cfg.difficulty);
+            // ABPS (and anything else) rebuilds BossLocationSpawn wholesale at boot and on raid
+            // end, wiping the difficulty rewrite of vanilla exUsec/pmcBot waves. Reapplying here
+            // covers our own entries redundantly and the vanilla/ABPS-recreated ones meaningfully.
+            if (cfg.forceHardestDifficulty)
+            {
+                QualityUpgrades.ForceDifficulty(mapBase.BossLocationSpawn, cfg.difficulty);
+            }
         }
     }
 
