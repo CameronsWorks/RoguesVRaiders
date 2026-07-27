@@ -36,5 +36,12 @@
   "ammoTailWeight": 0,                 // weight for everything below the top ranks (0 = never picked)
 
   "upgradeGearTier": true,             // gate headwear/vests to armored, high-class gear
-  "minArmorClass": 4                   // minimum resolved armor class kept in filtered pools
+  "minArmorClass": 4,                  // minimum resolved armor class kept in filtered pools
+
+  // Third-party faction mods (RUAF, UNTAR, Black Division, ...) each wire their own hostility and don't
+  // agree - UNTAR, for one, never counts a rogue or a raider an enemy. On = every faction bot installed
+  // fights both warbands and both warbands fight it. Affects vanilla Lighthouse rogues / Reserve raiders
+  // too, since the game only sees the role. Off = leave every faction mod's own wiring exactly as shipped.
+  "customFactionHostility": true,
+  "customFactionExclusions": []        // bot type names to leave alone, e.g. ["followeruntar"]
 }

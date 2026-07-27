@@ -10,9 +10,12 @@ starts on the map or arrives later, at about a 40/60 split; the latecomers turn 
 and 60% mark of the raid clock, scaled to whatever that map's timer is. So the place keeps changing after the
 first ten minutes. They pick objectives, hold points of interest, move between them, and hunt.
 
-Rogues and Raiders are hostile to each other, and to the custom factions if you run them. Player treatment
-follows the Friendliness setting, which defaults to faction-authentic: Rogues keep their Lighthouse manners
-and warn USEC before shooting, BEAR gets no warning, Raiders shoot everyone.
+Rogues and Raiders are hostile to each other, and to the custom factions if you run them — both ways round.
+Faction mods each decide who their own bots fight and they don't agree; UNTAR, for instance, ships counting
+neither Rogues nor Raiders an enemy, so it used to share a map with a warband as a neutral. Any faction bot
+that's installed now fights both warbands and both warbands fight it (`customFactionHostility`). Player
+treatment follows the Friendliness setting, which defaults to faction-authentic: Rogues keep their
+Lighthouse manners and warn USEC before shooting, BEAR gets no warning, Raiders shoot everyone.
 
 Where they roam:
 
@@ -82,6 +85,11 @@ patrol coverage. **Fika** only matters for co-op.
 - **ORBIT** must keep `Vanilla raiders (RESTART)` set to `true`. With it true ORBIT leaves exUsec and pmcBot
   alone. Flip it false and ORBIT starts driving the same bots this does, and the two will fight over the
   mover.
+- **Faction mods** — RUAF, UNTAR, Black Division, anything else that adds its own bot roles — are made
+  mutually hostile with both warbands at boot, whichever of them you have installed. The game decides that
+  by role, so it reaches ordinary Lighthouse Rogues and Reserve Raiders as well, not only these squads. Set
+  `customFactionHostility` to `false` to leave every faction mod's own wiring exactly as it shipped, or list
+  individual bot type names in `customFactionExclusions` to spare just those.
 - **Other gear or difficulty mods that touch exUsec or pmcBot** lose to this one. The upgrade block rewrites
   durability, ammo pools, equipment pools and armour plate weighting in place, and this mod deliberately
   loads late so it lands after ABPS — which means it also lands after most others. Nothing is written to
@@ -92,8 +100,9 @@ patrol coverage. **Fika** only matters for co-op.
 
 `SPT/user/mods/RoguesVRaidersServer/config.jsonc`, server restart to apply: faction map lists, per-map chance
 overrides (Reserve and Labs are dialled back to 15), `escortAmount`, spawn timing (`startSpawnShare`,
-`midRaidEarliest`, `midRaidLatest`), and the upgrade block (`difficulty`, `forceHardestDifficulty`,
-`upgradeDurability`, `upgradeAmmo`, `ammoRankWeights`, `upgradeGearTier`, `minArmorClass`).
+`midRaidEarliest`, `midRaidLatest`), the upgrade block (`difficulty`, `forceHardestDifficulty`,
+`upgradeDurability`, `upgradeAmmo`, `ammoRankWeights`, `upgradeGearTier`, `minArmorClass`), and faction-mod
+hostility (`customFactionHostility`, `customFactionExclusions`).
 
 Values are checked as they load. Anything unusable — an empty `escortAmount`, a chance of 5000, a `null`
 where a list belongs — clamps into range or reverts to its default and says which in the server log. A

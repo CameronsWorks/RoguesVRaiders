@@ -63,6 +63,7 @@ namespace RoguesVRaiders
 
             RvRPlugin.Log.LogInfo($"RvR scheduler: {_pending.Count} squad(s) planned on {mapId}");
             SquadRegistry.BeginRaid();
+            HostilitySeeder.Reset();
             if (RvRPlugin.ObjectiveEnable.Value) PoiRegistry.Build();
         }
 

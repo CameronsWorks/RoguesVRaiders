@@ -94,6 +94,12 @@ public class ConfigService
             cfg.ammoRankWeights = def.ammoRankWeights;
         }
 
+        if (cfg.customFactionExclusions == null)
+        {
+            warn("customFactionExclusions was null, treating it as empty");
+            cfg.customFactionExclusions = [];
+        }
+
         return cfg;
     }
 

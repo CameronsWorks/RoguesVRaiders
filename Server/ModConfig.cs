@@ -37,4 +37,7 @@ public class ModConfig
 
     public bool upgradeGearTier { get; set; } = true;
     public int minArmorClass { get; set; } = 4;
+
+    public bool customFactionHostility { get; set; } = true;
+    public List<string> customFactionExclusions { get; set; } = [];
 }
