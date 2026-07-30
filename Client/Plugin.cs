@@ -6,7 +6,7 @@ namespace RoguesVRaiders
 {
     public enum Friendliness { FactionAuthentic, FriendlyToPlayers, HostileToAll }
 
-    [BepInPlugin(PluginId, "Rogues V Raiders", "1.5.0")]
+    [BepInPlugin(PluginId, "Rogues V Raiders", "1.6.0")]
     [BepInDependency("com.fika.core", BepInDependency.DependencyFlags.SoftDependency)]
     [BepInDependency("xyz.drakia.bigbrain")]
     [BepInDependency("xyz.drakia.waypoints", BepInDependency.DependencyFlags.SoftDependency)]
@@ -43,9 +43,13 @@ namespace RoguesVRaiders
                 "Allow roaming Raider squads.");
             FriendlinessMode = Config.Bind("2. Behavior", "Friendliness", Friendliness.FactionAuthentic,
                 "How warband squads treat players. Faction authentic: rogues warn USEC first, raiders shoot.");
-            SpawnDistance = Config.Bind("3. Spawning", "Min Spawn Distance", 75,
-                new ConfigDescription("When the squad has a named spawn zone, wait until that zone is at least this far from every player (meters). Squads without a zone are gated only by the bot ceiling.",
-                    new AcceptableValueRange<int>(0, 200)));
+            SpawnDistance = Config.Bind("3. Spawning", "Min Distance From Players (m)", 200,
+                new ConfigDescription("Squads only take spawn points at least this far from every player, measured when "
+                    + "they actually spawn. A squad with a named zone is also held back while that zone is closer than "
+                    + "this to anyone, so most spawns land well past the floor; a zone that never opens up fields its "
+                    + "squad at the farthest points it has after five minutes. 0 turns the check off. On a co-op "
+                    + "server only the host's setting counts.",
+                    new AcceptableValueRange<int>(0, 500)));
             AliveBotCeiling = Config.Bind("3. Spawning", "Alive Bot Ceiling", 22,
                 new ConfigDescription("Squads wait while more bots than this are alive. Ignored when Force Spawn Over Bot Cap is on.",
                     new AcceptableValueRange<int>(10, 40)));

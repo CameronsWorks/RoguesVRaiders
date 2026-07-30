@@ -28,7 +28,10 @@
     <Content Include="Resources\config.jsonc" CopyToOutputDirectory="Always" />
   </ItemGroup>
 
-  <Target Name="DeployToServer" AfterTargets="Build">
+  <!-- SkipDeploy builds without touching the install; friends connect to this server, so a stray
+       build in friends mode would hand them beta code. The config copy only ever seeds a missing
+       file - it never overwrites a deployed (possibly testing) config. -->
+  <Target Name="DeployToServer" AfterTargets="Build" Condition="'$(SkipDeploy)' != 'true'">
     <MakeDir Directories="$(SptServer)\user\mods\RoguesVRaidersServer" />
     <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(SptServer)\user\mods\RoguesVRaidersServer" ContinueOnError="true" />
     <Copy SourceFiles="$(MSBuildProjectDirectory)\Resources\config.jsonc"

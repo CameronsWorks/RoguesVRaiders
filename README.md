@@ -109,8 +109,12 @@ where a list belongs — clamps into range or reverts to its default and says wh
 config the mod can't use at all leaves the mod inert for that session instead of stopping the server.
 
 F12, section *Rogues V Raiders*: Enable, Rogue Squads, Raider Squads, Friendliness, Roaming Objectives,
-Objective Layer Priority, Lockdown POIs, Lockdown Delay, Broad AI Hostility, Hunt and Takeover, Min Spawn
-Distance, Alive Bot Ceiling, Force Spawn Over Bot Cap, Scale Chance By Level, Verbose Logs.
+Objective Layer Priority, Lockdown POIs, Lockdown Delay, Broad AI Hostility, Hunt and Takeover, Min
+Distance From Players, Alive Bot Ceiling, Force Spawn Over Bot Cap, Scale Chance By Level, Verbose Logs.
+
+Squads spawn at least *Min Distance From Players* meters (default 200) from every player, measured at
+the points they actually take when the squad fires — a zone that never opens up fields its squad at the
+farthest points it has after five minutes rather than skipping it.
 
 Squad sizes assume the As Online bot amount setting.
 

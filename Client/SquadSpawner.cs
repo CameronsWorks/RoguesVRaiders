@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Comfort.Common;
@@ -40,14 +41,55 @@ namespace RoguesVRaiders
 
                 spawnParams.ShallBeGroup = new ShallBeGroupParams(true, true, data.Count);
 
-                var all = zone.SpawnPoints;
-                var points = all.OrderBy(_ => UnityEngine.Random.value).Take(data.Count).ToList();
-                for (var i = 0; points.Count < data.Count && all.Length > 0; i++) points.Add(all[i % all.Length]);
+                var all = zone.SpawnPoints.Where(p => p != null).ToList();
+                if (all.Count == 0)
+                {
+                    RvRPlugin.Log.LogWarning($"RvR: zone {zone.NameZone} has no spawn points for {plan.TriggerId} - not spawned");
+                    return;
+                }
+
+                // The scheduler's gate paces the attempt off the zone's centre; the promise is kept
+                // here, where the actual points are chosen. Distance is measured now — "at least this
+                // far" means when the squad spawns, not where people stood when the raid started.
+                var humans = new List<UnityEngine.Vector3>();
+                var world = Singleton<GameWorld>.Instance;
+                if (world?.AllAlivePlayersList != null)
+                {
+                    foreach (var player in world.AllAlivePlayersList)
+                        if (player != null && !player.IsAI) humans.Add(player.Position);
+                }
+
+                var nearest = new List<float>(all.Count);
+                foreach (var point in all)
+                {
+                    var d = float.MaxValue;
+                    foreach (var pos in humans)
+                    {
+                        var dist = UnityEngine.Vector3.Distance(point.Position, pos);
+                        if (dist < d) d = dist;
+                    }
+                    nearest.Add(d);
+                }
+
+                var floor = humans.Count > 0 ? (float)RvRPlugin.SpawnDistance.Value : 0f;
+                var picked = Core.SpawnPick.Pick(nearest, floor, data.Count, max => UnityEngine.Random.Range(0, max));
+                var points = picked.Select(i => all[i]).ToList();
 
                 spawner.TryToSpawnInZoneAndDelay(zone, data, withCheckMinMax: false, newWave: true,
                     pointsToSpawn: points, forcedSpawn: true);
 
-                RvRPlugin.Log.LogInfo($"RvR: spawning {plan.Faction} squad of {data.Count} at {zone.NameZone}");
+                if (floor > 0f)
+                {
+                    var closest = float.MaxValue;
+                    foreach (var i in picked) if (nearest[i] < closest) closest = nearest[i];
+                    var cleared = nearest.Count(d => d >= floor);
+                    RvRPlugin.Log.LogInfo($"RvR: spawning {plan.Faction} squad of {data.Count} at {zone.NameZone} "
+                        + $"({closest:F0}m from the nearest player; {cleared}/{all.Count} points cleared the {floor:F0}m floor)");
+                }
+                else
+                {
+                    RvRPlugin.Log.LogInfo($"RvR: spawning {plan.Faction} squad of {data.Count} at {zone.NameZone}");
+                }
             }
             catch (Exception ex)
             {

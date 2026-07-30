@@ -97,18 +97,25 @@ namespace RoguesVRaiders
                 }
 
                 if (entry.FirstAttempt < 0) entry.FirstAttempt = Time.time;
-                if (Time.time - entry.FirstAttempt > GiveUpAfterSeconds)
+
+                // A hard block (engine not ready, bot ceiling) that outlasts the timeout gives up, as
+                // ever. The distance gate is pacing, not a veto: past the timeout the squad spawns
+                // anyway, and the spawner puts it on the farthest points the zone has — small maps
+                // keep their squads, they just arrive as far out as the map allows.
+                var gate = Blocking(entry.Plan);
+                if (gate != Gate.Clear && Time.time - entry.FirstAttempt <= GiveUpAfterSeconds)
+                {
+                    entry.Plan.FireAtSeconds = (int)(elapsed + RetrySeconds);
+                    continue;
+                }
+                if (gate == Gate.Blocked)
                 {
                     entry.Fired = true;
                     RvRPlugin.Log.LogInfo($"RvR: gave up on {entry.Plan.TriggerId} (gates never cleared)");
                     continue;
                 }
-
-                if (!GatesClear(entry.Plan))
-                {
-                    entry.Plan.FireAtSeconds = (int)(elapsed + RetrySeconds);
-                    continue;
-                }
+                if (gate == Gate.Distance)
+                    RvRPlugin.Log.LogInfo($"RvR: {entry.Plan.TriggerId} waited out the distance gate - taking the far side of {entry.Plan.Zone}");
 
                 SquadSpawner.SpawnSquad(entry.Plan).HandleExceptions();
                 entry.Fired = true;
@@ -116,16 +123,22 @@ namespace RoguesVRaiders
             }
         }
 
-        static bool GatesClear(SquadPlan plan)
+        enum Gate { Clear, Blocked, Distance }
+
+        // Blocked never fires and gives up at the timeout. Distance is softer — it holds the squad
+        // while a player is near its zone so most spawns land well past the floor, but the floor
+        // itself is enforced per point in SquadSpawner, which is also what covers plans with no
+        // named zone at all.
+        static Gate Blocking(SquadPlan plan)
         {
             var botsController = Singleton<IBotGame>.Instance?.BotsController;
-            if (botsController?.BotSpawner == null) return false;
+            if (botsController?.BotSpawner == null) return Gate.Blocked;
 
             if (!RvRPlugin.IgnoreBotCap.Value &&
                 botsController.AliveAndLoadingBotsCount > RvRPlugin.AliveBotCeiling.Value)
             {
                 Debug($"{plan.TriggerId}: ceiling ({botsController.AliveAndLoadingBotsCount} alive)");
-                return false;
+                return Gate.Blocked;
             }
 
             if (!string.IsNullOrEmpty(plan.Zone))
@@ -134,7 +147,7 @@ namespace RoguesVRaiders
                 if (zone != null)
                 {
                     var world = Singleton<GameWorld>.Instance;
-                    if (world == null) return false;
+                    if (world == null) return Gate.Blocked;
 
                     var minDist = float.MaxValue;
                     foreach (var player in world.AllAlivePlayersList)
@@ -146,7 +159,7 @@ namespace RoguesVRaiders
                     if (minDist < RvRPlugin.SpawnDistance.Value)
                     {
                         Debug($"{plan.TriggerId}: player {minDist:F0}m from {plan.Zone}");
-                        return false;
+                        return Gate.Distance;
                     }
                 }
                 else
@@ -154,7 +167,7 @@ namespace RoguesVRaiders
                     Debug($"{plan.TriggerId}: zone {plan.Zone} not found, distance gate skipped");
                 }
             }
-            return true;
+            return Gate.Clear;
         }
 
         static void Debug(string message)
